@@ -1,9 +1,6 @@
 package com.poten.clova.service
 
-import com.poten.clova.dto.ApiResponse
-import com.poten.clova.dto.ChatCompletionRequest
-import com.poten.clova.dto.SystemMessage
-import com.poten.clova.dto.UserMessage
+import com.poten.clova.dto.*
 import com.poten.clova.entity.Message
 import com.poten.clova.repository.MessageRepository
 import com.poten.clova.repository.UserRepository
@@ -34,7 +31,7 @@ class ClovaService(
      * 4. save message entity with dId, userMessage, clovaMessage
      * 5. 부적은 별도로 저장하고, message entity id 랑 연관관계 매핑
      */
-    fun sendMessage(userMessage: UserMessage): String {
+    fun sendMessage(userMessage: UserMessage): ClovaMessage {
         val prompt = SystemMessage.Companion.Prompt()
         val chatCompletionRequest = ChatCompletionRequest(
             messages = listOf(
@@ -42,22 +39,36 @@ class ClovaService(
                 SystemMessage(role = "user", content = userMessage.message),
             )
         )
-        val response = ApiResponse.fromJson(getChatCompletion(chatCompletionRequest))
-        println("chatCompletion = $response")
+        val vickyPrompt = SystemMessage.Companion.VickyPrompt()
+        val vickyCompletionRequest = ChatCompletionRequest(
+            messages = listOf(
+                SystemMessage(role = vickyPrompt.role, content = vickyPrompt.content),
+                SystemMessage(role = "user", content = userMessage.message),
+            )
+        )
 
-        val computerMood = response.result.message.content
+        val computerMood = ApiResponse.fromJson(getChatCompletion(chatCompletionRequest))
+            .result
+            .message
+            .content
+
+        val vickyMood = ApiResponse.fromJson(getChatCompletion(vickyCompletionRequest))
+            .result
+            .message
+            .content
+
         val now = LocalDateTime.now()
         val messageEntity = Message(
             userMood = userMessage.message,
             clovaMood = computerMood,
+            vickyMood = vickyMood,
             deviceId = userMessage.deviceId,
             createdAt = now,
         )
 
         messageRepository.save(messageEntity)
-        return computerMood
+        return ClovaMessage(clova_mood = computerMood, vicky_mood = vickyMood)
     }
-
 
     fun getChatCompletion(request: ChatCompletionRequest): String {
         return clovaServiceClient.getChatCompletion(apiKey, apiGwKey, requestId, request)

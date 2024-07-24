@@ -18,6 +18,9 @@ data class Message (
     @Column(name = "clova_mood", nullable = false)
     val clovaMood: String,
 
+    @Column(name = "vicky_mood", nullable = false)
+    val vickyMood: String,
+
     @Column(nullable = false)
     val deviceId: String,
 

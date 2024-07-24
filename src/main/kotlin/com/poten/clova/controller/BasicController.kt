@@ -34,9 +34,9 @@ class BasicController(private val userService: UserService,
 
     @PostMapping("/message")
     fun messageController(@RequestBody userMessage: UserMessage): ResponseEntity<ResponseDto<ClovaMessage>> {
-        val sendMessage = clovaService.sendMessage(userMessage)
+        val clovaResponse = clovaService.sendMessage(userMessage)
         return ResponseEntity.ok()
-            .body(ObjectDto(ClovaMessage(sendMessage)))
+            .body(ObjectDto(clovaResponse))
     }
 
 }
