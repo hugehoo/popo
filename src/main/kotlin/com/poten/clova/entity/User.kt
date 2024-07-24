@@ -16,7 +16,7 @@ data class User (
     val name: String,
 
     @Column(nullable = false)
-    val age: Int,
+    val age: String,
 
     @Column(nullable = false)
     val deviceId: String,

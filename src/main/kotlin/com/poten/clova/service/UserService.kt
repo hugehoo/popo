@@ -18,7 +18,7 @@ class UserService(private val userRepository: UserRepository) {
         val now = LocalDateTime.now()
         val user = User(
             name = onboard.name,
-            age = onboard.age.toInt(), // Convert Number to Int
+            age = onboard.age.name,
             deviceId = onboard.deviceId,
             createdAt = now,
             updatedAt = now
