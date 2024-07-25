@@ -70,6 +70,22 @@ class ClovaService(
         return ClovaMessage(clova_mood = computerMood, vicky_mood = vickyMood)
     }
 
+
+    fun generateCharm(userMessage: UserMessage): CharmDto {
+
+        val charmPrompt = SystemMessage.Companion.CharmPrompt()
+        val chatCompletionRequest = ChatCompletionRequest(
+            messages = listOf(
+                SystemMessage(role = charmPrompt.role, content = charmPrompt.content),
+                SystemMessage(role = "user", content = userMessage.message),
+            )
+        )
+
+        val (_, result) = ApiResponse.fromJson(getChatCompletion(chatCompletionRequest))
+        val (fourIdioms, message) = ApiResponse.Companion.CharmMessage.getCharmMessage(result.message.content)
+        return CharmDto(four_idioms = fourIdioms, message = message)
+    }
+
     fun getChatCompletion(request: ChatCompletionRequest): String {
         return clovaServiceClient.getChatCompletion(apiKey, apiGwKey, requestId, request)
     }

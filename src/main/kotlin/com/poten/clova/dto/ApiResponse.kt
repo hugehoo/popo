@@ -38,5 +38,17 @@ data class ApiResponse(
             val mapper = jacksonObjectMapper()
             return mapper.readValue(json, ApiResponse::class.java)
         }
+
+
+        data class CharmMessage(val four_idioms: String, val message: String) {
+            companion object {
+                fun getCharmMessage(json: String): CharmMessage {
+                    val mapper = jacksonObjectMapper()
+                    return mapper.readValue(json, CharmMessage::class.java)
+                }
+            }
+        }
+
+
     }
 }

@@ -39,4 +39,10 @@ class BasicController(private val userService: UserService,
             .body(ObjectDto(clovaResponse))
     }
 
+    @PostMapping("/charm")
+    fun charmController(@RequestBody userMessage: UserMessage): ResponseEntity<ResponseDto<CharmDto>> {
+        val clovaResponse = clovaService.generateCharm(userMessage)
+        return ResponseEntity.ok()
+            .body(ObjectDto(clovaResponse))
+    }
 }
