@@ -1,13 +1,16 @@
 package com.poten.clova.controller
 
 import com.poten.clova.dto.*
+import com.poten.clova.entity.Message
 import com.poten.clova.service.ClovaService
 import com.poten.clova.service.UserService
+import org.springframework.data.domain.Page
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.data.domain.Pageable
 
 
 @RestController
@@ -17,6 +20,12 @@ class BasicController(private val userService: UserService,
     @GetMapping("/health-check")
     fun basicController(): String {
         return "healthy"
+    }
+
+    @GetMapping("/my-page")
+    fun getMyPage(pageable: Pageable): ResponseEntity<ResponseDto<Page<MessageDto>>> {
+        val user = userService.getMyPage("dserver1x3", pageable)
+        return ResponseEntity.ok().body(ObjectDto(user))
     }
 
     @GetMapping("/onboard")

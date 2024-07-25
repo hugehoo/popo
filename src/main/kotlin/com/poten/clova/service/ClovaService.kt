@@ -63,6 +63,7 @@ class ClovaService(
             clovaMood = computerMood,
             vickyMood = vickyMood,
             deviceId = userMessage.deviceId,
+            character = "popo",
             createdAt = now,
         )
 
