@@ -1,10 +1,22 @@
 package com.poten.clova.enum
 
 enum class AgeCategory {
-    TEEN,
-    EALRY_TWENTY,
+    CHILD,
+    EARLY_TEEN,
+    LATE_TEEN,
+    EARLY_TWENTY,
     LATE_TWENTY,
-    THIRTY,
-    FOURTY,
-    FIFTY
+    EARLY_THIRTY,
+    LATE_THIRTY,
+    FORTY,
+    SENIORS
 }
+
+
+
+
+
+
+
+
+

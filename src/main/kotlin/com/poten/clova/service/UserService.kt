@@ -3,6 +3,7 @@ package com.poten.clova.service
 import com.poten.clova.dto.MessageDto
 import com.poten.clova.dto.Onboard
 import com.poten.clova.entity.User
+import com.poten.clova.enum.AgeCategory
 import com.poten.clova.repository.MessageRepository
 import com.poten.clova.repository.UserRepository
 import org.springframework.data.domain.Page
@@ -16,8 +17,13 @@ class UserService(
     private val userRepository: UserRepository,
     private val messageRepository: MessageRepository) {
 
-    fun getUserById(deviceId: String): User? {
-        return userRepository.findByDeviceId(deviceId);
+    fun getUserById(deviceId: String): Onboard {
+        val user = userRepository.findByDeviceId(deviceId)
+        return Onboard(
+            name = user.name,
+            age = AgeCategory.valueOf(user.age),
+            deviceId = user.deviceId
+        );
     }
 
     fun getMyPage(deviceId: String, pageable: Pageable): Page<MessageDto> {

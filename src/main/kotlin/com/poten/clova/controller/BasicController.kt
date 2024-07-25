@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.data.domain.Pageable
+import org.springframework.web.bind.annotation.RequestParam
 
 
 @RestController
@@ -25,20 +26,22 @@ class BasicController(private val userService: UserService,
     @GetMapping("/my-page")
     fun getMyPage(pageable: Pageable): ResponseEntity<ResponseDto<Page<MessageDto>>> {
         val user = userService.getMyPage("dserver1x3", pageable)
-        return ResponseEntity.ok().body(ObjectDto(user))
+        return ResponseEntity.ok()
+            .body(ObjectDto(user))
     }
 
     @GetMapping("/onboard")
-    fun onBoardController(): ResponseEntity<ResponseDto<String>> {
-        val user = userService.getUserById("tester")
-
-        return ResponseEntity.ok().body(ObjectDto(user?.name))
+    fun onBoardController(@RequestParam(required = true) deviceId: String ): ResponseEntity<ResponseDto<Onboard>> {
+        val user = userService.getUserById(deviceId)
+        return ResponseEntity.ok()
+            .body(ObjectDto(user))
     }
 
     @PostMapping("/onboard")
     fun onBoardController(@RequestBody onboard: Onboard): ResponseEntity<ResponseDto<String>> {
         userService.saveUser(onboard)
-        return ResponseEntity.ok().body(ResponseDto())
+        return ResponseEntity.ok()
+            .body(ResponseDto())
     }
 
     @PostMapping("/message")
