@@ -6,12 +6,8 @@ import com.poten.clova.service.ClovaService
 import com.poten.clova.service.UserService
 import org.springframework.data.domain.Page
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
 import org.springframework.data.domain.Pageable
-import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.*
 
 
 @RestController
@@ -24,10 +20,17 @@ class BasicController(private val userService: UserService,
     }
 
     @GetMapping("/my-page")
-    fun getMyPage(pageable: Pageable): ResponseEntity<ResponseDto<Page<MessageDto>>> {
-        val user = userService.getMyPage("dserver1x3", pageable)
+    fun getMyPage(@RequestParam(required = true) deviceId: String, pageable: Pageable): ResponseEntity<ResponseDto<Page<MessageDto>>> {
+        val user = userService.getMyPage(deviceId, pageable)
         return ResponseEntity.ok()
             .body(ObjectDto(user))
+    }
+
+    @PatchMapping("/my-page/name")
+    fun updateUserName(@RequestBody onboard: Onboard): ResponseEntity<ResponseDto<String>> {
+        val user = userService.updateName(onboard)
+        return ResponseEntity.ok()
+            .body(ObjectDto())
     }
 
     @GetMapping("/onboard")

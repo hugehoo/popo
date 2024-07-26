@@ -13,7 +13,7 @@ data class User (
     val id: Long = 0,
 
     @Column(nullable = false)
-    val name: String,
+    var name: String,
 
     @Column(nullable = false)
     val age: String,

@@ -9,6 +9,7 @@ import com.poten.clova.repository.UserRepository
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 import org.springframework.data.domain.Pageable
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 
@@ -23,24 +24,34 @@ class UserService(
             name = user.name,
             age = AgeCategory.valueOf(user.age),
             deviceId = user.deviceId
-        );
+        )
     }
 
     fun getMyPage(deviceId: String, pageable: Pageable): Page<MessageDto> {
         val messages = messageRepository.findAllByDeviceId(deviceId, pageable)
-        return messages.map { it -> MessageDto.by(it) };
+        return messages.map { MessageDto.by(it) }
     }
 
     fun saveUser(onboard: Onboard) {
         val now = LocalDateTime.now()
         val user = User(
             name = onboard.name,
-            age = onboard.age.name,
+            age = onboard.age!!.name,
             deviceId = onboard.deviceId,
             createdAt = now,
             updatedAt = now
         )
         userRepository.save(user)
+    }
+
+    @Transactional
+    fun updateName(onboard: Onboard): String {
+        val user = userRepository.findByDeviceId(onboard.deviceId)
+
+        user.name = onboard.name
+        userRepository.save(user)
+
+        return "Success"
     }
 
 }
