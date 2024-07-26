@@ -1,8 +1,11 @@
 package com.poten.clova.dto
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies
+import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.poten.clova.entity.Message
 import java.time.LocalDate
 
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class MessageDto(
     val id: Long = 0L,
     val userMood: String,
