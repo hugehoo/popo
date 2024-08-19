@@ -1,5 +1,6 @@
 package com.poten.clova.roulette
 
+import org.redisson.api.RBucket
 import org.redisson.api.RedissonClient
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
@@ -11,13 +12,10 @@ import java.util.*
 class RouletteService(
     private val redissonClient: RedissonClient
 ) {
-
     private val rouletteKey: String = "roulette"
-
-    //    private val soldOuts = ConcurrentHashMap<Int, Roulette>()
     private val random = Random()
 
-    fun initRoulette(): List<Roulette> {
+    fun initRoulette(): RBucket<List<Roulette>>? {
         val dailyRoulette: List<Roulette> = listOf(
             Roulette(10, BigDecimal.valueOf(0.5), 40, false),
             Roulette(50, BigDecimal.valueOf(0.3), 30, false),
@@ -26,22 +24,14 @@ class RouletteService(
             Roulette(800, BigDecimal.valueOf(0.03), 4, false),
             Roulette(1000, BigDecimal.valueOf(0.02), 2, false)
         )
-        val bucket = redissonClient.getBucket<List<Roulette>>(rouletteKey)
+        val bucket = getRouletteItems()
         bucket.set(dailyRoulette)
-        return dailyRoulette
+        return bucket
     }
 
-    //    val rouletteAtomicLists: List<Roulette> = listOf(
-//        Roulette(10, BigDecimal.valueOf(0.5), 40),
-//        Roulette(50, BigDecimal.valueOf(0.3), 30),
-//        Roulette(100, BigDecimal.valueOf(0.1), 16),
-//        Roulette(500, BigDecimal.valueOf(0.05), 8),
-//        Roulette(800, BigDecimal.valueOf(0.03), 4),
-//        Roulette(1000, BigDecimal.valueOf(0.02), 2)
-//    )
     fun play(): Roulette {
 
-        val bucket = redissonClient.getBucket<List<Roulette>>(rouletteKey)
+        val bucket = getRouletteItems()
         val rouletteList: List<Roulette> = bucket.get()
 
         val soldOuts = rouletteList.filter { it -> it.soldOut }
@@ -52,6 +42,14 @@ class RouletteService(
         decreaseStock(roulette)
         bucket.set(rouletteList)
         return roulette
+    }
+
+    private fun getRouletteItems(): RBucket<List<Roulette>> {
+        val bucket = redissonClient.getBucket<List<Roulette>>(rouletteKey)
+        if (!bucket.isExists) {
+            initRoulette()
+        }
+        return bucket
     }
 
     private fun getRouletteProbability(
