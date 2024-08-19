@@ -2,6 +2,7 @@ package com.poten.clova.service
 
 import com.poten.clova.dto.MessageDto
 import com.poten.clova.dto.Onboard
+import com.poten.clova.dto.OnboardDto
 import com.poten.clova.entity.User
 import com.poten.clova.enum.AgeCategory
 import com.poten.clova.repository.MessageRepository
@@ -32,7 +33,7 @@ class UserService(
         return messages.map { MessageDto.by(it) }
     }
 
-    fun saveUser(onboard: Onboard) {
+    fun saveUser(onboard: OnboardDto) {
         val now = LocalDateTime.now()
         val user = User(
             name = onboard.name,
@@ -45,7 +46,7 @@ class UserService(
     }
 
     @Transactional
-    fun updateName(onboard: Onboard): String {
+    fun updateName(onboard: OnboardDto): String {
         val user = userRepository.findByDeviceId(onboard.deviceId)
 
         user.name = onboard.name

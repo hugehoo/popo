@@ -1,17 +1,18 @@
 package com.poten.clova.controller
 
 import com.poten.clova.dto.*
-import com.poten.clova.entity.Message
+import com.poten.clova.roulette.RouletteService
 import com.poten.clova.service.ClovaService
 import com.poten.clova.service.UserService
 import org.springframework.data.domain.Page
-import org.springframework.http.ResponseEntity
 import org.springframework.data.domain.Pageable
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 
 @RestController
 class BasicController(private val userService: UserService,
+                      private val rouletteService: RouletteService,
                       private val clovaService: ClovaService) {
 
     @GetMapping("/health-check")
@@ -27,7 +28,7 @@ class BasicController(private val userService: UserService,
     }
 
     @PatchMapping("/my-page/name")
-    fun updateUserName(@RequestBody onboard: Onboard): ResponseEntity<ResponseDto<String>> {
+    fun updateUserName(@RequestBody onboard: OnboardDto): ResponseEntity<ResponseDto<String>> {
         val user = userService.updateName(onboard)
         return ResponseEntity.ok()
             .body(ObjectDto())
@@ -41,7 +42,7 @@ class BasicController(private val userService: UserService,
     }
 
     @PostMapping("/onboard")
-    fun onBoardController(@RequestBody onboard: Onboard): ResponseEntity<ResponseDto<String>> {
+    fun onBoardController(@RequestBody onboard: OnboardDto): ResponseEntity<ResponseDto<String>> {
         userService.saveUser(onboard)
         return ResponseEntity.ok()
             .body(ResponseDto())
