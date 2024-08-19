@@ -36,8 +36,15 @@ dependencies {
 	implementation ("org.redisson:redisson-spring-boot-starter:3.23.3")
 
 	runtimeOnly("com.mysql:mysql-connector-j")
+
+	// test
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+	testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
+	testImplementation("org.testcontainers:junit-jupiter:1.16.3")
+	testImplementation("org.testcontainers:testcontainers:1.16.3")
+	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
+	testImplementation("io.mockk:mockk:1.12.0")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
 }
