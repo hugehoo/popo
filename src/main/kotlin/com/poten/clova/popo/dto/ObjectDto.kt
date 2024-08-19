@@ -1,4 +1,4 @@
-package com.poten.clova.dto
+package com.poten.clova.popo.dto
 
 
 class ObjectDto<T>(data: T? = null) : ResponseDto<T>(

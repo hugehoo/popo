@@ -1,4 +1,4 @@
-package com.poten.clova.dto
+package com.poten.clova.popo.dto
 
 data class SystemMessage(
     val role: String,

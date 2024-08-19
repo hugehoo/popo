@@ -1,7 +1,7 @@
-package com.poten.clova.service
+package com.poten.clova.popo.service
 
 
-import com.poten.clova.dto.ChatCompletionRequest
+import com.poten.clova.popo.dto.ChatCompletionRequest
 import feign.Headers
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.web.bind.annotation.GetMapping

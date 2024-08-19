@@ -1,9 +1,10 @@
-package com.poten.clova.controller
+package com.poten.clova.popo.controller
 
 import com.poten.clova.dto.*
+import com.poten.clova.popo.dto.*
 import com.poten.clova.roulette.RouletteService
-import com.poten.clova.service.ClovaService
-import com.poten.clova.service.UserService
+import com.poten.clova.popo.service.ClovaService
+import com.poten.clova.popo.service.UserService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
@@ -13,7 +14,8 @@ import org.springframework.web.bind.annotation.*
 @RestController
 class BasicController(private val userService: UserService,
                       private val rouletteService: RouletteService,
-                      private val clovaService: ClovaService) {
+                      private val clovaService: ClovaService
+) {
 
     @GetMapping("/health-check")
     fun basicController(): String {

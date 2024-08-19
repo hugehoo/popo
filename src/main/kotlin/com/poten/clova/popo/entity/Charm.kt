@@ -1,4 +1,4 @@
-package com.poten.clova.entity
+package com.poten.clova.popo.entity
 
 import jakarta.persistence.*
 import java.time.LocalDateTime

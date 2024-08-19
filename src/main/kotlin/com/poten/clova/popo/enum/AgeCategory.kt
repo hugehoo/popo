@@ -1,4 +1,4 @@
-package com.poten.clova.enum
+package com.poten.clova.popo.enum
 
 enum class AgeCategory {
     CHILD,

@@ -1,6 +1,6 @@
-package com.poten.clova.repository
+package com.poten.clova.popo.repository
 
-import com.poten.clova.entity.User
+import com.poten.clova.popo.entity.User
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 

@@ -1,6 +1,8 @@
 package com.poten.clova.roulette
 
 import com.poten.clova.dto.*
+import com.poten.clova.popo.dto.ObjectDto
+import com.poten.clova.popo.dto.ResponseDto
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 

@@ -1,4 +1,4 @@
-package com.poten.clova.dto
+package com.poten.clova.popo.dto
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 

@@ -1,12 +1,13 @@
-package com.poten.clova.service
+package com.poten.clova.popo.service
 
 import com.poten.clova.dto.*
-import com.poten.clova.entity.Message
-import com.poten.clova.entity.Prompt
-import com.poten.clova.enum.Character
-import com.poten.clova.repository.MessageRepository
-import com.poten.clova.repository.PromptRepository
-import com.poten.clova.repository.UserRepository
+import com.poten.clova.popo.entity.Message
+import com.poten.clova.popo.entity.Prompt
+import com.poten.clova.popo.enum.Character
+import com.poten.clova.popo.dto.*
+import com.poten.clova.popo.repository.MessageRepository
+import com.poten.clova.popo.repository.PromptRepository
+import com.poten.clova.popo.repository.UserRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -53,7 +54,8 @@ class ClovaService(
 
     private fun processMessage(userMessage: UserMessage,
                                prompt: SystemMessage.Companion.Prompt,
-                               characterName: Character): ClovaMessage {
+                               characterName: Character
+    ): ClovaMessage {
 
         val chatCompletionRequest = ChatCompletionRequest(
             messages = listOf(

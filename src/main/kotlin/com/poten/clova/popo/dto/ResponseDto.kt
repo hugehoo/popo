@@ -1,4 +1,4 @@
-package com.poten.clova.dto
+package com.poten.clova.popo.dto
 
 
 open class ResponseDto<T>(

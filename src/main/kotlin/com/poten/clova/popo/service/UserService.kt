@@ -1,12 +1,12 @@
-package com.poten.clova.service
+package com.poten.clova.popo.service
 
-import com.poten.clova.dto.MessageDto
-import com.poten.clova.dto.Onboard
-import com.poten.clova.dto.OnboardDto
-import com.poten.clova.entity.User
-import com.poten.clova.enum.AgeCategory
-import com.poten.clova.repository.MessageRepository
-import com.poten.clova.repository.UserRepository
+import com.poten.clova.popo.dto.MessageDto
+import com.poten.clova.popo.dto.Onboard
+import com.poten.clova.popo.dto.OnboardDto
+import com.poten.clova.popo.entity.User
+import com.poten.clova.popo.enum.AgeCategory
+import com.poten.clova.popo.repository.MessageRepository
+import com.poten.clova.popo.repository.UserRepository
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 import org.springframework.data.domain.Pageable
@@ -17,7 +17,8 @@ import java.time.LocalDateTime
 @Service
 class UserService(
     private val userRepository: UserRepository,
-    private val messageRepository: MessageRepository) {
+    private val messageRepository: MessageRepository
+) {
 
     fun getUserById(deviceId: String): Onboard {
         val user = userRepository.findByDeviceId(deviceId)
