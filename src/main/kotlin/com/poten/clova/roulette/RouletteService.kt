@@ -31,9 +31,13 @@ class RouletteService(
         bucket.set(dailyRoulette)
         return bucket
     }
-
     fun play(): Roulette {
-        val lock: RLock = redissonClient.getLock("rouletteLock")
+        return executeWithLock("rouletteLock", ::playRoulette)
+    }
+
+    private fun <T> executeWithLock(lockName: String, action: () -> T): T {
+        //TODO : Lockname 이 왜 필요한거지?
+        val lock: RLock = redissonClient.getLock(lockName)
 
         try {
             // 락 획득 시도 (최대 20초 동안 대기, 30초 후 자동 해제)
@@ -41,27 +45,31 @@ class RouletteService(
 
             if (isLocked) {
                 try {
-                    val bucket = getRouletteItems()
-                    val rouletteList: List<Roulette> = bucket.get()
-
-                    val soldOuts = rouletteList.filter { it.soldOut }
-                    checkPlayAvailable(soldOuts)
-
-                    val rouletteProbability = getRouletteProbability(rouletteList, soldOuts)
-                    val roulette = getResult(rouletteProbability)
-                    decreaseStock(roulette)
-                    bucket.set(rouletteList)
-                    return roulette
+                    return action()
                 } finally {
                     lock.unlock()
                 }
             } else {
-                throw IllegalStateException("Failed to acquire lock for roulette play")
+                throw IllegalStateException("Failed to acquire lock for $lockName")
             }
         } catch (e: InterruptedException) {
             Thread.currentThread().interrupt()
             throw IllegalStateException("Lock acquisition was interrupted", e)
         }
+    }
+
+    private fun playRoulette(): Roulette {
+        val bucket = getRouletteItems()
+        val rouletteList: List<Roulette> = bucket.get()
+
+        val soldOuts = rouletteList.filter { it.soldOut }
+        checkPlayAvailable(soldOuts)
+
+        val rouletteProbability = getRouletteProbability(rouletteList, soldOuts)
+        val roulette = getResult(rouletteProbability)
+        decreaseStock(roulette)
+        bucket.set(rouletteList)
+        return roulette
     }
 
     // without lock
@@ -127,13 +135,6 @@ class RouletteService(
             { obj: BigDecimal, agent: BigDecimal? -> obj.add(agent) }
         val availableSize = rouletteAtomicLists.size - soldOuts.size
         return sumSoldOutProbability.divide(BigDecimal.valueOf(availableSize.toLong()), 3, RoundingMode.HALF_UP)
-    }
-
-    fun currentTotalStock(rouletteAtomicLists: List<Roulette>): Int {
-        return rouletteAtomicLists
-            .stream()
-            .map { obj: Roulette -> obj.stock }
-            .reduce(0) { a: Int, b: Int -> Integer.sum(a, b) }
     }
 
     private fun checkPlayAvailable(soldOuts: List<Roulette>) {
