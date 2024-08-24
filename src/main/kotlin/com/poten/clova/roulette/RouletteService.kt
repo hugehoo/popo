@@ -36,7 +36,7 @@ class RouletteService(
         val lock: RLock = redissonClient.getLock("rouletteLock")
 
         try {
-            // 락 획득 시도 (최대 10초 동안 대기, 30초 후 자동 해제)
+            // 락 획득 시도 (최대 20초 동안 대기, 30초 후 자동 해제)
             val isLocked = lock.tryLock(20, 30, TimeUnit.SECONDS)
 
             if (isLocked) {
