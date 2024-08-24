@@ -1,6 +1,5 @@
 package com.poten.clova.popo.service
 
-import com.poten.clova.dto.*
 import com.poten.clova.popo.entity.Message
 import com.poten.clova.popo.entity.Prompt
 import com.poten.clova.popo.enum.Character
