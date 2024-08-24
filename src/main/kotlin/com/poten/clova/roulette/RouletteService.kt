@@ -1,11 +1,13 @@
 package com.poten.clova.roulette
 
 import org.redisson.api.RBucket
+import org.redisson.api.RLock
 import org.redisson.api.RedissonClient
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 @Service
@@ -14,6 +16,7 @@ class RouletteService(
 ) {
     private val rouletteKey: String = "roulette"
     private val random = Random()
+
 
     fun initRoulette(): RBucket<List<Roulette>>? {
         val dailyRoulette: List<Roulette> = listOf(
@@ -30,19 +33,52 @@ class RouletteService(
     }
 
     fun play(): Roulette {
+        val lock: RLock = redissonClient.getLock("rouletteLock")
 
-        val bucket = getRouletteItems()
-        val rouletteList: List<Roulette> = bucket.get()
+        try {
+            // 락 획득 시도 (최대 10초 동안 대기, 30초 후 자동 해제)
+            val isLocked = lock.tryLock(20, 30, TimeUnit.SECONDS)
 
-        val soldOuts = rouletteList.filter { it -> it.soldOut }
-        checkPlayAvailable(soldOuts)
+            if (isLocked) {
+                try {
+                    val bucket = getRouletteItems()
+                    val rouletteList: List<Roulette> = bucket.get()
 
-        val rouletteProbability = getRouletteProbability(rouletteList, soldOuts)
-        val roulette = getResult(rouletteProbability)
-        decreaseStock(roulette)
-        bucket.set(rouletteList)
-        return roulette
+                    val soldOuts = rouletteList.filter { it.soldOut }
+                    checkPlayAvailable(soldOuts)
+
+                    val rouletteProbability = getRouletteProbability(rouletteList, soldOuts)
+                    val roulette = getResult(rouletteProbability)
+                    decreaseStock(roulette)
+                    bucket.set(rouletteList)
+                    return roulette
+                } finally {
+                    lock.unlock()
+                }
+            } else {
+                throw IllegalStateException("Failed to acquire lock for roulette play")
+            }
+        } catch (e: InterruptedException) {
+            Thread.currentThread().interrupt()
+            throw IllegalStateException("Lock acquisition was interrupted", e)
+        }
     }
+
+    // without lock
+//    fun play(): Roulette {
+//
+//        val bucket = getRouletteItems()
+//        val rouletteList: List<Roulette> = bucket.get()
+//
+//        val soldOuts = rouletteList.filter { it -> it.soldOut }
+//        checkPlayAvailable(soldOuts)
+//
+//        val rouletteProbability = getRouletteProbability(rouletteList, soldOuts)
+//        val roulette = getResult(rouletteProbability)
+//        decreaseStock(roulette)
+//        bucket.set(rouletteList)
+//        return roulette
+//    }
 
     private fun getRouletteItems(): RBucket<List<Roulette>> {
         val bucket = redissonClient.getBucket<List<Roulette>>(rouletteKey)
@@ -102,7 +138,7 @@ class RouletteService(
 
     private fun checkPlayAvailable(soldOuts: List<Roulette>) {
         if (soldOuts.size == 6) {
-            throw IllegalStateException()
+            throw StockException("Out of Stock Exception")
         }
     }
 }
