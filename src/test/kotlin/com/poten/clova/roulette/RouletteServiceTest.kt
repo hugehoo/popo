@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit
 class RouletteServiceTest {
     companion object {
         private lateinit var redissonClient: RedissonClient
+        private lateinit var redissonTemplate: RedisTemplate
 
         @Container
         private val redis = GenericContainer(DockerImageName.parse("redis:6.2.6-alpine"))
@@ -33,6 +34,7 @@ class RouletteServiceTest {
             config.useSingleServer()
                 .setAddress("redis://localhost:6379")
             redissonClient = Redisson.create(config)
+            redissonTemplate = RedisTemplate(redissonClient)
         }
 
         @AfterAll
@@ -47,7 +49,7 @@ class RouletteServiceTest {
 
     @BeforeEach
     fun setUp() {
-        rouletteService = RouletteService(redissonClient)
+        rouletteService = RouletteService(redissonTemplate)
         rouletteService.initRoulette()
     }
 
