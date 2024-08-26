@@ -1,6 +1,5 @@
 package com.poten.clova.popo.controller
 
-import com.poten.clova.dto.*
 import com.poten.clova.popo.dto.*
 import com.poten.clova.roulette.RouletteService
 import com.poten.clova.popo.service.ClovaService

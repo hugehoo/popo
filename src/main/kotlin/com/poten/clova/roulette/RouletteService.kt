@@ -1,16 +1,18 @@
 package com.poten.clova.roulette
 
 import org.redisson.api.RBucket
+import org.redisson.api.RLock
 import org.redisson.api.RedissonClient
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 @Service
 class RouletteService(
-    private val redissonClient: RedissonClient
+    private val redisTemplate: RedisTemplate,
 ) {
     private val rouletteKey: String = "roulette"
     private val random = Random()
@@ -28,13 +30,15 @@ class RouletteService(
         bucket.set(dailyRoulette)
         return bucket
     }
-
     fun play(): Roulette {
+        return redisTemplate.executeWithLock("rouletteLock", ::playRoulette)
+    }
 
+    private fun playRoulette(): Roulette {
         val bucket = getRouletteItems()
         val rouletteList: List<Roulette> = bucket.get()
 
-        val soldOuts = rouletteList.filter { it -> it.soldOut }
+        val soldOuts = rouletteList.filter { it.soldOut }
         checkPlayAvailable(soldOuts)
 
         val rouletteProbability = getRouletteProbability(rouletteList, soldOuts)
@@ -44,9 +48,25 @@ class RouletteService(
         return roulette
     }
 
+    // without lock
+//    fun play(): Roulette {
+//
+//        val bucket = getRouletteItems()
+//        val rouletteList: List<Roulette> = bucket.get()
+//
+//        val soldOuts = rouletteList.filter { it -> it.soldOut }
+//        checkPlayAvailable(soldOuts)
+//
+//        val rouletteProbability = getRouletteProbability(rouletteList, soldOuts)
+//        val roulette = getResult(rouletteProbability)
+//        decreaseStock(roulette)
+//        bucket.set(rouletteList)
+//        return roulette
+//    }
+
     private fun getRouletteItems(): RBucket<List<Roulette>> {
-        val bucket = redissonClient.getBucket<List<Roulette>>(rouletteKey)
-        if (!bucket.isExists) {
+        val bucket = redisTemplate.getBucket()
+        if (!bucket!!.isExists) {
             initRoulette()
         }
         return bucket
@@ -93,16 +113,9 @@ class RouletteService(
         return sumSoldOutProbability.divide(BigDecimal.valueOf(availableSize.toLong()), 3, RoundingMode.HALF_UP)
     }
 
-    fun currentTotalStock(rouletteAtomicLists: List<Roulette>): Int {
-        return rouletteAtomicLists
-            .stream()
-            .map { obj: Roulette -> obj.stock }
-            .reduce(0) { a: Int, b: Int -> Integer.sum(a, b) }
-    }
-
     private fun checkPlayAvailable(soldOuts: List<Roulette>) {
         if (soldOuts.size == 6) {
-            throw IllegalStateException()
+            throw StockException("Out of Stock Exception")
         }
     }
 }
